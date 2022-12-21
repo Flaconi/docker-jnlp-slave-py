@@ -1,0 +1,155 @@
+---
+name: Build-Publish
+
+on:
+  push:
+    branches:
+  release:
+    types: [released]
+
+jobs:
+  build-publish:
+    name: "Python-${{ matrix.PYTHON }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        PYTHON:
+          - 3.7.16
+          - 3.8.16
+          - 3.9.16
+          - 3.10.9
+          - 3.11.1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set Variables
+        id: vars
+        run: |
+          # Extract python subversions
+          PYTHON_MAJOR=$(echo $PYTHON | sed 's/\.[0-9]\+$//')
+          PYTHON_PATCH=$(echo $PYTHON | sed 's/^[0-9]\+\.[0-9]\+\.//')
+          
+          # Extract git tag or git branch
+          if echo "${GITHUB_REF}" | grep -q "refs/tags/"; then
+            SLUG="${GITHUB_REF/refs\/tags\//}"
+          fi
+          if echo "${GITHUB_REF}" | grep -q "refs/heads/"; then
+            SLUG="${GITHUB_REF/refs\/heads\//}"
+            if echo "${SLUG}" | grep -q '^dependabot\/'; then
+              SLUG="${SLUG/dependabot\/github_actions\/actions\//dependabot-}"
+            fi
+          fi
+
+          # Build Docker image tag
+          if [ "${SLUG}" = "master" ]; then
+            TAG="${PYTHON}"
+          else
+            TAG="${PYTHON_MAJOR}"
+          fi
+
+          # Output for debugging
+          echo "SLUG=${SLUG}"
+          echo "TAG=${TAG}"
+
+          # Store GitHub Action env vars
+          echo "PYTHON_MAJOR=${PYTHON_MAJOR}" >> "${GITHUB_ENV}"
+          echo "PYTHON_PATCH=${PYTHON_PATCH}" >> "${GITHUB_ENV}"
+          echo "TAG=${TAG}"                   >> "${GITHUB_ENV}"
+        env:
+          PYTHON: ${{ matrix.PYTHON }}
+
+      - name: Build
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep 2;
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make build PYTHON_MAJOR=${PYTHON_MAJOR} PYTHON_PATCH=${PYTHON_PATCH}
+        env:
+          RETRIES: 20
+
+      - name: Test
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep 2;
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make test PYTHON_MAJOR=${PYTHON_MAJOR} PYTHON_PATCH=${PYTHON_PATCH}
+        env:
+          RETRIES: 20
+
+      - name: Tag
+        run: |
+          make tag TAG=${TAG}
+          docker images
+
+      - name: Login
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep 2;
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make login DOCKER_USER=${{ secrets.DOCKER_USERNAME }} DOCKER_PASS=${{ secrets.DOCKER_PASSWORD }}
+        env:
+          RETRIES: 20
+        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+            && (
+              (github.event_name == 'schedule' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'release'     && github.event.action == 'released')
+            )
+
+      - name: Push
+        run: |
+          retry() {
+            for n in $(seq ${RETRIES}); do
+              echo "[${n}/${RETRIES}] ${*}";
+              if eval "${*}"; then
+                echo "[SUCC] ${n}/${RETRIES}";
+                return 0;
+              fi;
+              sleep 2;
+              echo "[FAIL] ${n}/${RETRIES}";
+            done;
+            return 1;
+          }
+          retry make push TAG=${TAG}
+        env:
+          RETRIES: 20
+        # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
+        if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
+            && (
+              (github.event_name == 'schedule' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'push'     && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')))
+              ||
+              (github.event_name == 'release'     && github.event.action == 'released')
+            )
