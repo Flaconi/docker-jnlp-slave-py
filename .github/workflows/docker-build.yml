@@ -28,7 +28,7 @@ jobs:
       - name: Set Variables
         id: vars
         run: |
-          # Extract python subversions
+          # Extract python subversion
           PYTHON_MAJOR=$(echo $PYTHON | sed 's/\.[0-9]\+$//')
           PYTHON_PATCH=$(echo $PYTHON | sed 's/^[0-9]\+\.[0-9]\+\.//')
           
@@ -77,7 +77,7 @@ jobs:
           }
           retry make build PYTHON_MAJOR=${PYTHON_MAJOR} PYTHON_PATCH=${PYTHON_PATCH}
         env:
-          RETRIES: 20
+          RETRIES: 5
 
       - name: Test
         run: |
@@ -95,7 +95,7 @@ jobs:
           }
           retry make test PYTHON_MAJOR=${PYTHON_MAJOR} PYTHON_PATCH=${PYTHON_PATCH}
         env:
-          RETRIES: 20
+          RETRIES: 5
 
       - name: Tag
         run: |
@@ -118,7 +118,7 @@ jobs:
           }
           retry make login DOCKER_USER=${{ secrets.DOCKER_USERNAME }} DOCKER_PASS=${{ secrets.DOCKER_PASSWORD }}
         env:
-          RETRIES: 20
+          RETRIES: 5
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (
@@ -145,7 +145,7 @@ jobs:
           }
           retry make push TAG=${TAG}
         env:
-          RETRIES: 20
+          RETRIES: 5
         # https://help.github.com/en/github/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#functions
         if: github.event.pull_request.base.repo.id == github.event.pull_request.head.repo.id
             && (
