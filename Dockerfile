@@ -6,7 +6,7 @@ ARG PYTHON_MAJOR
 ARG PYTHON_PATCH
 RUN export PYTHON_SEMVER="${PYTHON_MAJOR}.${PYTHON_PATCH}" \
   && apt-get update \
-  && apt-get install -y \
+  && apt-get install --no-install-recommends --no-install-suggests -y \
     wget \
     build-essential \
     libc6-dev \
