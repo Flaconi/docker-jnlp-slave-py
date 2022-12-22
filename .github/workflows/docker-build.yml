@@ -32,19 +32,15 @@ jobs:
           # Extract python subversion
           PYTHON_MAJOR=$(echo $PYTHON | sed 's/\.[0-9]\+$//')
           PYTHON_PATCH=$(echo $PYTHON | sed 's/^[0-9]\+\.[0-9]\+\.//')
-          
-          # Extract git tag or git branch
-          REF="${{ github.ref_name }}"
 
           # Build Docker image tag
-          if [ "${REF}" = "master" ]; then
-            TAG="${PYTHON}"
-          else
+          if [ "${{ github.ref_type }}" = "tag" ]; then
             TAG="${PYTHON_MAJOR}"
+          else
+            TAG="${PYTHON}"
           fi
 
           # Output for debugging
-          echo "REF=${REF}"
           echo "TAG=${TAG}"
 
           # Store GitHub Action env vars
