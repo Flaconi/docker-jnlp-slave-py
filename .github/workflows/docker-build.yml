@@ -15,8 +15,6 @@ jobs:
       fail-fast: false
       matrix:
         PYTHON:
-          - 3.3.7
-          - 3.4.10
           - 3.5.10
           - 3.6.15
           - 3.7.16
