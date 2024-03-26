@@ -13,8 +13,8 @@ TAG = latest
 JENKINS_SLAVE = 4.13.3-1-jdk11
 
 # Python versions: $PYTHON_MAJOR.PYTHON_PATCH
-PYTHON_MAJOR = 3.11
-PYTHON_PATCH = 1
+PYTHON_MAJOR = 3.12
+PYTHON_PATCH = 2
 
 pull:
 	docker pull $(shell grep FROM Dockerfile | sed 's/^FROM//g' | sed "s/\$${JENKINS_SLAVE}/$(JENKINS_SLAVE)/g";)
