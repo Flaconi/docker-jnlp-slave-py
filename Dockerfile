@@ -28,6 +28,7 @@ RUN export PYTHON_SEMVER="${PYTHON_MAJOR}.${PYTHON_PATCH}" \
   && make altinstall \
   && pip${PYTHON_MAJOR} install six \
   && ln -s /usr/local/bin/python${PYTHON_MAJOR} /usr/local/bin/python3 \
+  && ln -s /usr/local/bin/pip${PYTHON_MAJOR} /usr/local/bin/pip \
   # Clean up
 	&& apt-get remove -f -y --purge --auto-remove build-essential \
 	&& apt-get clean \
