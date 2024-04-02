@@ -1,5 +1,5 @@
-ARG JENKINS_SLAVE
-FROM jenkins/jnlp-slave:${JENKINS_SLAVE}
+ARG JENKINS_AGENT
+FROM jenkins/inbound-agent:${JENKINS_AGENT}
 USER root
 
 ARG PYTHON_MAJOR
