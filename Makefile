@@ -10,19 +10,19 @@ IMAGE = flaconi/jnlp-slave-py
 TAG = latest
 
 # Base image version
-JENKINS_SLAVE = 4.13.3-1-jdk11
+JENKINS_AGENT = 3206.vb_15dcf73f6a_9-9
 
 # Python versions: $PYTHON_MAJOR.PYTHON_PATCH
 PYTHON_MAJOR = 3.12
 PYTHON_PATCH = 2
 
 pull:
-	docker pull $(shell grep FROM Dockerfile | sed 's/^FROM//g' | sed "s/\$${JENKINS_SLAVE}/$(JENKINS_SLAVE)/g";)
+	docker pull $(shell grep FROM Dockerfile | sed 's/^FROM//g' | sed "s/\$${JENKINS_AGENT}/$(JENKINS_AGENT)/g";)
 
 build:
 	docker build \
 	  --network=host \
-    --build-arg JENKINS_SLAVE=$(JENKINS_SLAVE) \
+    --build-arg JENKINS_AGENT=$(JENKINS_AGENT) \
 		--build-arg PYTHON_MAJOR=$(PYTHON_MAJOR) \
     --build-arg PYTHON_PATCH=$(PYTHON_PATCH) \
 		-t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
