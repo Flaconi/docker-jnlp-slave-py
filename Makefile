@@ -22,6 +22,7 @@ pull:
 build:
 	docker build \
 	  --network=host \
+    --build-arg JENKINS_AGENT=$(JENKINS_AGENT) \
 		--build-arg PYTHON_MAJOR=$(PYTHON_MAJOR) \
     --build-arg PYTHON_PATCH=$(PYTHON_PATCH) \
 		-t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
