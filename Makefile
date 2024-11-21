@@ -13,8 +13,8 @@ TAG = latest
 JENKINS_AGENT = 3283.v92c105e0f819-1-jdk17
 
 # Python versions: $PYTHON_MAJOR.$PYTHON_PATCH
-PYTHON_MAJOR = 3.12
-PYTHON_PATCH = 7
+PYTHON_MAJOR = 3.13
+PYTHON_PATCH = 0
 
 pull:
 	docker pull $(shell grep FROM Dockerfile | sed 's/^FROM//g' | sed "s/\$${JENKINS_AGENT}/$(JENKINS_AGENT)/g";)
