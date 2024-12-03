@@ -10,7 +10,7 @@ IMAGE = flaconi/jnlp-slave-py
 TAG = latest
 
 # Base image version: https://github.com/jenkinsci/docker-agent/releases/latest
-JENKINS_AGENT = 3283.v92c105e0f819-1-jdk17
+JENKINS_AGENT = 3283.v92c105e0f819-2-jdk21
 
 # Python versions: $PYTHON_MAJOR.$PYTHON_PATCH
 PYTHON_MAJOR = 3.13
