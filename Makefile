@@ -14,7 +14,7 @@ JENKINS_AGENT =  3301.v4363ddcca_4e7-3-jdk21
 
 # Python versions: $PYTHON_MAJOR.$PYTHON_PATCH
 PYTHON_MAJOR = 3.13
-PYTHON_PATCH = 2
+PYTHON_PATCH = 3
 
 pull:
 	docker pull $(shell grep FROM Dockerfile | sed 's/^FROM//g' | sed "s/\$${JENKINS_AGENT}/$(JENKINS_AGENT)/g";)
