@@ -10,11 +10,11 @@ IMAGE = flaconi/jnlp-slave-py
 TAG = latest
 
 # Base image version: https://github.com/jenkinsci/docker-agent/releases/latest
-JENKINS_AGENT = 3355.v388858a_47b_33-1
+JENKINS_AGENT = 3355.v388858a_47b_33-3
 
 # Python versions: $PYTHON_MAJOR.$PYTHON_PATCH
 PYTHON_MAJOR = 3.14
-PYTHON_PATCH = 1
+PYTHON_PATCH = 2
 
 pull:
 	docker pull $(shell grep FROM Dockerfile | sed 's/^FROM//g' | sed "s/\$${JENKINS_AGENT}/$(JENKINS_AGENT)/g";)
